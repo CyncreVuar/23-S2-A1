@@ -25,7 +25,10 @@ class SimpleStats(Stats):
 
     def __init__(self, attack, defense, speed, max_hp) -> None:
         # TODO: Implement
-        pass
+        self.attack = attack
+        self.defense = defense
+        self.speed = speed
+        self.max_hp = max_hp
 
     def get_attack(self):
         raise NotImplementedError

@@ -12,43 +12,47 @@ class MonsterBase(abc.ABC):
         :simple_mode: Whether to use the simple or complex stats of this monster
         :level: The starting level of this monster. Defaults to 1.
         """
-        raise NotImplementedError
+        self.simple_mode = simple_mode
+        self.level = level
 
     def get_level(self):
         """The current level of this monster instance"""
-        raise NotImplementedError
+        return self.level
 
     def level_up(self):
         """Increase the level of this monster instance by 1"""
-        raise NotImplementedError
+        self.level += 1
 
     def get_hp(self):
         """Get the current HP of this monster instance"""
-        raise NotImplementedError
+        return self.hp
 
     def set_hp(self, val):
         """Set the current HP of this monster instance"""
-        raise NotImplementedError
+        self.hp = val
 
     def get_attack(self):
         """Get the attack of this monster instance"""
-        raise NotImplementedError
+        return self.attack
 
     def get_defense(self):
         """Get the defense of this monster instance"""
-        raise NotImplementedError
+        return self.defense
 
     def get_speed(self):
         """Get the speed of this monster instance"""
-        raise NotImplementedError
+        return self.speed
 
     def get_max_hp(self):
         """Get the maximum HP of this monster instance"""
-        raise NotImplementedError
+        return self.max_hp
 
     def alive(self) -> bool:
-        """Whether the current monster instance is alive (HP > 0 )"""
-        raise NotImplementedError
+        """Whether the current monster instance is alive (HP > 0 )""" 
+        if self.hp > 0: 
+            return True
+        else:
+            return False
 
     def attack(self, other: MonsterBase):
         """Attack another monster instance"""
@@ -60,11 +64,19 @@ class MonsterBase(abc.ABC):
 
     def ready_to_evolve(self) -> bool:
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""
-        raise NotImplementedError
+        if self.get_evolution() == None:
+            return False
+        elif self.level < 2:
+            return False
+        return True
+
 
     def evolve(self) -> MonsterBase:
         """Evolve this monster instance by returning a new instance of a monster class."""
         raise NotImplementedError
+    
+    def str(self):
+        return (f"LV.{self.get_level} {self.get_name()}, {self.get_hp}/{self.get_max_hp} HP")
 
     ### NOTE
     # Below is provided by the factory - classmethods
