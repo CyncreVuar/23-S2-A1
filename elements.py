@@ -75,16 +75,26 @@ class EffectivenessCalculator:
         Water is double effective to Fire, and half effective to Water and Grass [2, 0.5, 0.5]
         Grass is half effective to Fire and Grass, and double effective to Water [0.5, 2, 0.5]
         """
-        raise NotImplementedError
+        self.element_names = element_names
+        self.effectiveness_values = effectiveness_values
 
     @classmethod
-    def get_effectiveness(cls, type1: Element, type2: Element) -> float:
+    def get_effectiveness(cls, type1: Element, type2: Element) -> float:    #o(n*comp + n*comp) = o(n*comp)
         """
         Returns the effectivness of elem1 attacking elem2.
 
         Example: EffectivenessCalculator.get_effectiveness(Element.FIRE, Element.WATER) == 0.5
         """
-        raise NotImplementedError
+        for i in range(len(cls.instance.element_names)):                                   #o(n)
+            if  Element.from_string(cls.instance.element_names[i]) == type1:            #o(comp)
+                index = i * len(cls.instance.element_names)
+        for i_ in range(len(cls.instance.element_names)):                                  #o(n) 
+            if  Element.from_string(cls.instance.element_names[i_]) == type2:           #o(comp)
+
+                index += i_
+                
+
+        return cls.instance.effectiveness_values[index]
 
     @classmethod
     def from_csv(cls, csv_file: str) -> EffectivenessCalculator:
@@ -96,9 +106,9 @@ class EffectivenessCalculator:
             rest = rest.replace("\n", ",").split(",")
             a_header = ArrayR(len(header))
             a_all = ArrayR(len(rest))
-            for i in range(len(header)):
+            for i in range(len(header)):  
                 a_header[i] = header[i]
-            for i in range(len(rest)):
+            for i in range(len(rest)):   
                 a_all[i] = float(rest[i])
             return EffectivenessCalculator(a_header, a_all)
 
