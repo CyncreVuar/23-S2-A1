@@ -6,8 +6,11 @@ from base_enum import BaseEnum
 from monster_base import MonsterBase
 from random_gen import RandomGen
 from helpers import get_all_monsters
-
+from data_structures.stack_adt import ArrayStack
+from data_structures.queue_adt import CircularQueue
+from data_structures.array_sorted_list import ArraySortedList
 from data_structures.referential_array import ArrayR
+
 
 if TYPE_CHECKING:
     from battle import Battle
@@ -39,6 +42,17 @@ class MonsterTeam:
     def __init__(self, team_mode: TeamMode, selection_mode, **kwargs) -> None:
         # Add any preinit logic here.
         self.team_mode = team_mode
+
+        if self.team_mode.name == "FRONT": 
+            self.team = ArrayStack(self.TEAM_LIMIT)
+        elif self.team_mode.name == "BACK":     
+            self.team = CircularQueue(self.TEAM_LIMIT)    
+        elif self.team_mode.name == "OPTIMISE": 
+            self.team = ArraySortedList(self.TEAM_LIMIT)
+            self.sort_method = kwargs['sort_mode']
+            # if self.sort_method == MonsterTeam.SortMode.HP:
+
+
         if selection_mode == self.SelectionMode.RANDOM:
             self.select_randomly(**kwargs)
         elif selection_mode == self.SelectionMode.MANUAL:
@@ -49,16 +63,37 @@ class MonsterTeam:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
 
     def add_to_team(self, monster: MonsterBase):
-        raise NotImplementedError
+        if self.team_mode.name == "FRONT": 
+            self.team.push(monster)
+        elif self.team_mode.name == "BACK":     
+            self.team.append(monster)
+        elif self.team_mode.name == "OPTIMISE": 
+            print("ggez") 
+
 
     def retrieve_from_team(self) -> MonsterBase:
-        raise NotImplementedError
+        if self.team_mode.name == "FRONT": 
+            print("front")
+        elif self.team_mode.name == "BACK":     
+            print("BACK")
+        elif self.team_mode.name == "OPTIMISE": 
+            print("ggez") 
 
     def special(self) -> None:
-        raise NotImplementedError
+        if self.team_mode.name == "FRONT": 
+            print("front")
+        elif self.team_mode.name == "BACK":     
+            print("BACK")
+        elif self.team_mode.name == "OPTIMISE": 
+            print("ggez") 
 
     def regenerate_team(self) -> None:
-        raise NotImplementedError
+        if self.team_mode.name == "FRONT": 
+            print("front")
+        elif self.team_mode.name == "BACK":     
+            print("BACK")
+        elif self.team_mode.name == "OPTIMISE": 
+            print("ggez") 
 
     def select_randomly(self):
         team_size = RandomGen.randint(1, self.TEAM_LIMIT)
