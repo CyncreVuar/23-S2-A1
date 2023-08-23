@@ -45,12 +45,15 @@ class MonsterTeam:
 
         if self.team_mode.name == "FRONT": 
             self.team = ArrayStack(self.TEAM_LIMIT)
+            self.team_original = ArrayStack(self.TEAM_LIMIT)
         elif self.team_mode.name == "BACK":     
             self.team = CircularQueue(self.TEAM_LIMIT)    
+            self.team_original = CircularQueue(self.TEAM_LIMIT) 
         elif self.team_mode.name == "OPTIMISE": 
             self.team = ArraySortedList(self.TEAM_LIMIT)
             self.sort_method = kwargs['sort_mode']
             # if self.sort_method == MonsterTeam.SortMode.HP:
+        self.team_original
 
 
         if selection_mode == self.SelectionMode.RANDOM:
@@ -73,17 +76,34 @@ class MonsterTeam:
 
     def retrieve_from_team(self) -> MonsterBase:
         if self.team_mode.name == "FRONT": 
-            print("front")
+            self.team.pop()
         elif self.team_mode.name == "BACK":     
-            print("BACK")
+            self.team.serve()
         elif self.team_mode.name == "OPTIMISE": 
-            print("ggez") 
+            self.team.delete_at_index(0)
 
     def special(self) -> None:
         if self.team_mode.name == "FRONT": 
-            print("front")
-        elif self.team_mode.name == "BACK":     
-            print("BACK")
+            buffer_queue = CircularQueue(3)
+            for _ in range(min(MonsterTeam.TEAM_LIMIT/2, len(self.team))):
+                buffer_queue.append(self.team.pop())
+            for _ in range(len(buffer_queue)):
+                self.team.push(buffer_queue.serve())
+        elif self.team_mode.name == "BACK":
+            front_half = len(self.team)//2
+            back_half = len(self.team)-(len(self.team)//2)     
+            buffer_queue = CircularQueue(front_half)
+            buffer_stack = ArrayStack(back_half)
+            for _ in range(front_half):
+                buffer_queue.append(self.team.serve())
+            for _ in range(back_half):     
+                buffer_stack.push(self.team.serve())
+            
+            for _ in range(back_half):
+                self.team.append(buffer_stack.pop())
+            for _ in range(front_half):
+                self.team.append(buffer_queue.serve())
+            
         elif self.team_mode.name == "OPTIMISE": 
             print("ggez") 
 
@@ -117,6 +137,70 @@ class MonsterTeam:
                 raise ValueError("Spawning logic failed.")
 
     def select_manually(self):
+        check = False
+        while check == False:
+            Team_size = input("How many monsters are there?")
+            try: 
+                Team_size = int(Team_size)
+                if Team_size <= 6 and Team_size > 0:
+                    check = True
+            except:
+                print("Please enter an integer between 1 and 6")
+
+        if self.team_mode.name == "FRONT": 
+            buffer_stack = ArrayStack(Team_size)
+            check = False
+            for _ in range(Team_size):
+                print("""MONSTERS Are:
+                1: Flamikin [✔️]
+                2: Infernoth [❌]
+                3: Infernox [❌]
+                4: Aquariuma [✔️]
+                5: Marititan [❌]
+                6: Leviatitan [❌]
+                7: Vineon [✔️]
+                8: Treetower [❌]
+                9: Treemendous [❌]
+                10: Rockodile [✔️]
+                11: Stonemountain [❌]
+                12: Gustwing [✔️]
+                13: Stormeagle [❌]
+                14: Frostbite [✔️]
+                15: Blizzarus [❌]
+                16: Thundrake [✔️]
+                17: Thunderdrake [❌]
+                18: Shadowcat [✔️]
+                19: Nightpanther [❌]
+                20: Mystifly [✔️]
+                21: Telekite [❌]
+                22: Metalhorn [✔️]
+                23: Ironclad [❌]
+                24: Normake [❌]
+                25: Strikeon [✔️]
+                26: Venomcoil [✔️]
+                27: Pythondra [✔️]
+                28: Constriclaw [✔️]
+                29: Shockserpent [✔️]
+                30: Driftsnake [✔️]
+                31: Aquanake [✔️]
+                32: Flameserpent [✔️]
+                33: Leafadder [✔️]
+                34: Iceviper [✔️]
+                35: Rockpython [✔️]
+                36: Soundcobra [✔️]
+                37: Psychosnake [✔️]
+                38: Groundviper [✔️]
+                39: Faeboa [✔️]
+                40: Bugrattler [✔️]
+                41: Darkadder [✔️]""")
+                while check == False:
+                    monster = input("Which monster are you spawning?")
+                
+
+        elif self.team_mode.name == "BACK":     
+            self.team.serve()
+        elif self.team_mode.name == "OPTIMISE": 
+            self.team.delete_at_index(0)
         """
         Prompt the user for input on selecting the team.
         Any invalid input should have the code prompt the user again.
@@ -236,6 +320,12 @@ class MonsterTeam:
         Example team if in TeamMode.FRONT:
         [Gustwing Instance, Aquariuma Instance, Flamikin Instance]
         """
+        if self.team_mode.name == "FRONT": 
+            self.team.pop()
+        elif self.team_mode.name == "BACK":     
+            self.team.serve()
+        elif self.team_mode.name == "OPTIMISE": 
+            self.team.delete_at_index(0)
         raise NotImplementedError
 
     def choose_action(self, currently_out: MonsterBase, enemy: MonsterBase) -> Battle.Action:
