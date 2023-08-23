@@ -1,6 +1,8 @@
 from __future__ import annotations
 import abc
 
+
+
 from stats import Stats
 
 class MonsterBase(abc.ABC):
@@ -14,6 +16,13 @@ class MonsterBase(abc.ABC):
         """
         self.simple_mode = simple_mode
         self.level = level
+        self.original_level = level
+        self.hp = self.get_max_hp()
+
+    def __str__ (self):
+
+
+        return (f"LV.{self.level} {self.get_name()}, {self.get_hp()}/{self.get_max_hp()} HP")
 
     def get_level(self):
         """The current level of this monster instance"""
@@ -21,7 +30,9 @@ class MonsterBase(abc.ABC):
 
     def level_up(self):
         """Increase the level of this monster instance by 1"""
+        hp_difference = self.get_max_hp()-self.hp
         self.level += 1
+        self.set_hp(self.get_max_hp() - hp_difference)
 
     def get_hp(self):
         """Get the current HP of this monster instance"""
@@ -33,19 +44,19 @@ class MonsterBase(abc.ABC):
 
     def get_attack(self):
         """Get the attack of this monster instance"""
-        return self.attack
+        return self.get_simple_stats().get_attack()
 
     def get_defense(self):
         """Get the defense of this monster instance"""
-        return self.defense
+        return self.get_simple_stats().get_defense()
 
     def get_speed(self):
         """Get the speed of this monster instance"""
-        return self.speed
+        return self.get_simple_stats().get_speed()
 
     def get_max_hp(self):
         """Get the maximum HP of this monster instance"""
-        return self.max_hp
+        return self.get_simple_stats().get_max_hp()
 
     def alive(self) -> bool:
         """Whether the current monster instance is alive (HP > 0 )""" 
@@ -66,17 +77,20 @@ class MonsterBase(abc.ABC):
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""
         if self.get_evolution() == None:
             return False
-        elif self.level < 2:
-            return False
-        return True
+        elif self.level > self.original_level:
+            return True
+        return False
 
 
     def evolve(self) -> MonsterBase:
         """Evolve this monster instance by returning a new instance of a monster class."""
-        raise NotImplementedError
+        hp_difference = self.get_simple_stats().get_max_hp()-self.hp
+        evolved = self.get_evolution()(self.simple_mode, self.level)
+        evolved.set_hp(evolved.get_simple_stats().get_max_hp() - hp_difference)
+        return evolved
+
     
-    def str(self):
-        return (f"LV.{self.get_level} {self.get_name()}, {self.get_hp}/{self.get_max_hp} HP")
+
 
     ### NOTE
     # Below is provided by the factory - classmethods
@@ -139,3 +153,4 @@ class MonsterBase(abc.ABC):
         Same for all monsters of the same type.
         """
         pass
+
