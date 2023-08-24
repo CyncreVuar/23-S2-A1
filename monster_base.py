@@ -1,5 +1,8 @@
 from __future__ import annotations
 import abc
+from elements import EffectivenessCalculator
+from elements import Element
+import math
 
 
 
@@ -71,7 +74,18 @@ class MonsterBase(abc.ABC):
         # Step 2: Apply type effectiveness
         # Step 3: Ceil to int
         # Step 4: Lose HP
-        raise NotImplementedError
+        if (self.get_attack()/2) > other.get_defense():
+            damage = self.get_attack() - other.get_defense()
+        elif self.get_attack() > other.get_defense():
+            damage = (self.get_attack() * 5/8) - (other.get_defense()/4)
+        else:
+            damage = self.get_attack() / 4
+        damage = math.ceil(damage * EffectivenessCalculator.get_effectiveness(Element.from_string(self.get_element()), Element.from_string(other.get_element())))
+        print("DAMAGE DEALT", str(self), "did", damage, "damage")
+        print("DAMAGE ELEMENT",self.get_element(), "to", other.get_element(), EffectivenessCalculator.get_effectiveness(Element.from_string(self.get_element()), Element.from_string(other.get_element())))
+
+        other.set_hp(other.get_hp() - damage)
+
 
     def ready_to_evolve(self) -> bool:
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""

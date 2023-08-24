@@ -85,6 +85,7 @@ class EffectivenessCalculator:
 
         Example: EffectivenessCalculator.get_effectiveness(Element.FIRE, Element.WATER) == 0.5
         """
+        index = 0
         for i in range(len(cls.instance.element_names)):                                   #o(n)
             if  Element.from_string(cls.instance.element_names[i]) == type1:            #o(comp)
                 index = i * len(cls.instance.element_names)

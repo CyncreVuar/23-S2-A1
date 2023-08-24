@@ -1,6 +1,9 @@
 import abc
 
 from data_structures.referential_array import ArrayR
+from data_structures.stack_adt import ArrayStack
+from data_structures.array_sorted_list import ArraySortedList
+from data_structures.sorted_list_adt import ListItem
 
 class Stats(abc.ABC):
 
@@ -52,16 +55,193 @@ class ComplexStats(Stats):
         max_hp_formula: ArrayR[str],
     ) -> None:
         # TODO: Implement
+        self.attack_formula = attack_formula
+        self.defense_formula = defense_formula
+        self. speed_formula = speed_formula
+        self.max_hp_formula = max_hp_formula
         pass
 
     def get_attack(self, level: int):
-        raise NotImplementedError
+        calc_stack = ArrayStack(20)
+        for elem in self.attack_formula:
+            if elem == "+":
+                calc_stack.push(float(calc_stack.pop()) + float(calc_stack.pop()))
+            elif elem == "/":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 / op2)
+            elif elem == "-":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 - op2)
+            elif elem == "*":
+                calc_stack.push(float(calc_stack.pop()) * float(calc_stack.pop()))
+            elif elem == "level":
+                calc_stack.push(float(level))
+            elif elem == "power":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 ** op2)
+            elif elem == "sqrt":
+                calc_stack.push(float(calc_stack.pop())** (1/2))
+            elif elem == "middle":
+                median_list = ArraySortedList(3)
+                op3 = float(calc_stack.pop())
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                median_list.add(ListItem(op3, op3))
+                median_list.add(ListItem(op2, op2))
+                median_list.add(ListItem(op1, op1))
+                calc_stack.push(median_list.delete_at_index(1).value)
+            else:
+                calc_stack.push(elem)
+        return int(calc_stack.pop())
 
     def get_defense(self, level: int):
-        raise NotImplementedError
+        calc_stack = ArrayStack(20)
+        for elem in self.defense_formula:
+            if elem == "+":
+                calc_stack.push(float(calc_stack.pop()) + float(calc_stack.pop()))
+            elif elem == "/":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 / op2)
+            elif elem == "-":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 - op2)
+            elif elem == "*":
+                calc_stack.push(float(calc_stack.pop()) * float(calc_stack.pop()))
+            elif elem == "level":
+                calc_stack.push(float(level))
+            elif elem == "power":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 ** op2)
+            elif elem == "sqrt":
+                calc_stack.push(float(calc_stack.pop())** (1/2))
+            elif elem == "middle":
+                median_list = ArraySortedList(3)
+                op3 = float(calc_stack.pop())
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                median_list.add(ListItem(op3, op3))
+                median_list.add(ListItem(op2, op2))
+                median_list.add(ListItem(op1, op1))
+                calc_stack.push(median_list.delete_at_index(1).value)
+            else:
+                calc_stack.push(elem)
+        return int(calc_stack.pop())
 
     def get_speed(self, level: int):
-        raise NotImplementedError
+        calc_stack = ArrayStack(20)
+        for elem in self.speed_formula:
+            if elem == "+":
+                calc_stack.push(float(calc_stack.pop()) + float(calc_stack.pop()))
+            elif elem == "/":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 / op2)
+            elif elem == "-":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 - op2)
+            elif elem == "*":
+                calc_stack.push(float(calc_stack.pop()) * float(calc_stack.pop()))
+            elif elem == "level":
+                calc_stack.push(float(level))
+            elif elem == "power":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 ** op2)
+            elif elem == "sqrt":
+                calc_stack.push(float(calc_stack.pop())** (1/2))
+            elif elem == "middle":
+                median_list = ArraySortedList(3)
+                op3 = float(calc_stack.pop())
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                median_list.add(ListItem(op3, op3))
+                median_list.add(ListItem(op2, op2))
+                median_list.add(ListItem(op1, op1))
+                calc_stack.push(median_list.delete_at_index(1).value)
+            else:
+                calc_stack.push(elem)
+        return int(calc_stack.pop())
 
     def get_max_hp(self, level: int):
-        raise NotImplementedError
+        calc_stack = ArrayStack(20)
+        for elem in self.max_hp_formula:
+            if elem == "+":
+                calc_stack.push(float(calc_stack.pop()) + float(calc_stack.pop()))
+            elif elem == "/":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 / op2)
+            elif elem == "-":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 - op2)
+            elif elem == "*":
+                calc_stack.push(float(calc_stack.pop()) * float(calc_stack.pop()))
+            elif elem == "level":
+                calc_stack.push(float(level))
+            elif elem == "power":
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                calc_stack.push(op1 ** op2)
+            elif elem == "sqrt":
+                calc_stack.push(float(calc_stack.pop())** (1/2))
+            elif elem == "middle":
+                median_list = ArraySortedList(3)
+                op3 = float(calc_stack.pop())
+                op2 = float(calc_stack.pop())
+                op1 = float(calc_stack.pop())
+                median_list.add(ListItem(op3, op3))
+                median_list.add(ListItem(op2, op2))
+                median_list.add(ListItem(op1, op1))
+                calc_stack.push(median_list.delete_at_index(1).value)
+            else:
+                calc_stack.push(elem)
+        return int(calc_stack.pop())
+
+
+
+
+if __name__ == "__main__":
+    cs = ComplexStats(
+                ArrayR.from_list([
+                    "5",
+                    "6",
+                    "+"
+                ]),
+                ArrayR.from_list([
+                    "9",
+                    "2",
+                    "8",
+                    "middle"
+                ]),
+                ArrayR.from_list([
+                    "level",
+                    "3",
+                    "power",
+                    "1",
+                    "2",
+                    "3",
+                    "middle",
+                    "*"
+                ]),
+                ArrayR.from_list([
+                    "level",
+                    "5",
+                    "-",
+                    "sqrt",
+                    "1",
+                    "10",
+                    "middle",
+                ]),
+            )
+    print(cs.get_attack(1), 11)
+    print(cs.get_defense(1), 8)
+    print(cs.get_speed(5), 250)
+    print(cs.get_max_hp(41), 6)

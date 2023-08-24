@@ -71,6 +71,8 @@ class MonsterTeam:
         else:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
         
+    def __str__ (self):
+        return (f"{self.team_mode.name} TEAM")
     def __len__ (self):
 
         return len(self.team)
