@@ -71,6 +71,16 @@ class MonsterTeam:
         else:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
         
+        # if self.team_mode.name == "FRONT": 
+        #     self.team = ArrayStack(self.TEAM_LIMIT)
+        #     self.team_original = ArrayStack(self.TEAM_LIMIT)
+        #     self.type = "FRONT"
+        # elif self.team_mode.name == "BACK":     
+        #     self.team = CircularQueue(self.TEAM_LIMIT)    
+        #     self.team_original = CircularQueue(self.TEAM_LIMIT) 
+        # elif self.team_mode.name == "OPTIMISE": 
+        
+        
     def __str__ (self):
         return (f"{self.team_mode.name} TEAM")
     def __len__ (self):
@@ -161,7 +171,56 @@ class MonsterTeam:
                 self.reversed == False
 
     def regenerate_team(self) -> None:
-        self.team = self.team_original
+        while len(self.team):               #empty out team
+            self.retrieve_from_team()
+
+
+        if self.team_mode.name == "FRONT":
+            buffer_stack_copy = ArrayStack(6)
+            buffer_stack = ArrayStack(6)
+            while len(self.team_original): 
+                monster = self.team_original.pop()
+                monster_copy = type(monster)(simple_mode=monster.simple_mode, level=monster.level)
+                buffer_stack_copy.push(monster_copy)
+                buffer_stack.push(monster)
+
+            while len(buffer_stack): 
+                monster_copy = buffer_stack_copy.pop()
+                monster = buffer_stack.pop()
+                self.add_to_team(monster_copy)
+                self.team_original.push(monster)
+            
+        elif self.team_mode.name == "BACK":
+            buffer_queue = CircularQueue(6)
+            while len(self.team_original):     
+                monster = self.team_original.serve()
+                monster_copy = type(monster)(simple_mode=monster.simple_mode, level=monster.level)
+                self.add_to_team(monster_copy)
+                buffer_queue.append(monster)
+            while len(buffer_queue):
+                self.team_original.append(buffer_queue.serve())
+            
+
+
+        elif self.team_mode.name == "OPTIMISE":
+            buffer_slist = ArraySortedList(6)
+            while len(self.team_original): 
+                monster_and_key = self.team_original.delete_at_index(0)
+                monster = monster_and_key.value
+                monster_copy = type(monster)(simple_mode=monster.simple_mode, level=monster.level)
+                self.add_to_team(monster_copy)
+                buffer_slist.add(monster_and_key)
+            while len(buffer_slist):
+                self.team_original.add(buffer_slist.delete_at_index(0))
+
+
+                
+
+
+                
+            
+
+        
 
     def select_randomly(self):
         team_size = RandomGen.randint(1, self.TEAM_LIMIT)
@@ -180,6 +239,22 @@ class MonsterTeam:
                     if cur_index == spawner_index:
                         # Spawn this monster
                         self.add_to_team(monsters[x]())
+                        if self.team_mode.name == "FRONT": 
+                            self.team_original.push(monsters[x]())
+                        elif self.team_mode.name == "BACK":     
+                            self.team_original.append(monsters[x]())
+                        elif self.team_mode.name == "OPTIMISE": 
+                            if self.sort_method == MonsterTeam.SortMode.HP:
+                                monster_and_key = ListItem(monsters[x](), monsters[x]().get_hp() * -1)
+                            elif self.sort_method == MonsterTeam.SortMode.ATTACK:
+                                monster_and_key = ListItem(monsters[x](), monsters[x]().get_attack() * -1)
+                            elif self.sort_method == MonsterTeam.SortMode.DEFENSE:
+                                monster_and_key = ListItem(monsters[x](), monsters[x]().get_defense() * -1)
+                            elif self.sort_method == MonsterTeam.SortMode.SPEED:
+                                monster_and_key = ListItem(monsters[x](), monsters[x]().get_speed() * -1)
+                            elif self.sort_method == MonsterTeam.SortMode.LEVEL:
+                                monster_and_key = ListItem(monsters[x](), monsters[x]().get_level() * -1)
+                            self.team_original.add(monster_and_key)   
                         break
             else:
                 raise ValueError("Spawning logic failed.")
@@ -455,25 +530,36 @@ if __name__ == "__main__":
     # team.regenerate_team()
     # print(len(team))
     # print(team.retrieve_from_team())
-
-
-    my_monsters = ArrayR(2)
-    my_monsters[0] = Flamikin
-    my_monsters[1] = Normake
     team = MonsterTeam(
         team_mode=MonsterTeam.TeamMode.OPTIMISE,
         selection_mode=MonsterTeam.SelectionMode.PROVIDED,
         sort_key=MonsterTeam.SortMode.HP,
-        provided_monsters=my_monsters,
+        provided_monsters=ArrayR.from_list([Flamikin, Aquariuma, Vineon, Thundrake, Thundrake, Thundrake])
     )
-    # Rockodile, Aquariuma, Flamikin, Thundrake
 
+    print('*******')
+    print(team)
 
+    hi = team.retrieve_from_team()
+    hi.set_hp(2)
+    team.add_to_team(hi)
 
+    while len(team):
+        print(team.retrieve_from_team())
+    
+    team.regenerate_team()
+    print('\n')
 
-    print(team.retrieve_from_team())
-    print(team.retrieve_from_team())
+    team.special()
 
+    hi = team.retrieve_from_team()
+    hi.set_hp(2)
+    team.add_to_team(hi)
+
+    team.regenerate_team()
+    
+    while len(team):
+        print(team.retrieve_from_team())
 
 
 
