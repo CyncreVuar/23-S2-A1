@@ -122,3 +122,4 @@ EffectivenessCalculator.make_singleton()
 
 if __name__ == "__main__":
     print(EffectivenessCalculator.get_effectiveness(Element.FIRE, Element.WATER))
+
