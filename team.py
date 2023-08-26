@@ -43,6 +43,7 @@ class MonsterTeam:
     TEAM_LIMIT = 6
 
     def __init__(self, team_mode: TeamMode, selection_mode, **kwargs) -> None:
+        """O(1) best case and worse case"""
         # Add any preinit logic here.
         self.team_mode = team_mode
 
@@ -50,9 +51,13 @@ class MonsterTeam:
             self.team = ArrayStack(self.TEAM_LIMIT)
             self.team_original = ArrayStack(self.TEAM_LIMIT)
             self.type = "FRONT"
+
+            
         elif self.team_mode.name == "BACK":     
             self.team = CircularQueue(self.TEAM_LIMIT)    
             self.team_original = CircularQueue(self.TEAM_LIMIT) 
+
+
         elif self.team_mode.name == "OPTIMISE": 
             self.team = ArraySortedList(self.TEAM_LIMIT)
             self.sort_method = kwargs['sort_key']
@@ -82,20 +87,22 @@ class MonsterTeam:
         
         
     def __str__ (self):
+        """o(1) best case and worse case"""
         return (f"{self.team_mode.name} TEAM")
     def __len__ (self):
 
         return len(self.team)
 
     def add_to_team(self, monster: MonsterBase):
-        if self.team_mode.name == "FRONT": 
+        """O(1) Best and worst case"""
+        if self.team_mode.name == "FRONT": # O(1) Best case worst case
             self.team.push(monster)
-        elif self.team_mode.name == "BACK":     
+        elif self.team_mode.name == "BACK":  # O(1) Best case worst case
             self.team.append(monster)
-        elif self.team_mode.name == "OPTIMISE": 
+        elif self.team_mode.name == "OPTIMISE": #Best case Worst case O(len(self))  
 
 
-            if self.reversed == False:
+            if self.reversed == False: #O(1) best and worst case
                 if self.sort_method == MonsterTeam.SortMode.HP:
                     monster_and_key = ListItem(monster, monster.get_hp() * -1)
                 elif self.sort_method == MonsterTeam.SortMode.ATTACK:
@@ -106,7 +113,7 @@ class MonsterTeam:
                     monster_and_key = ListItem(monster, monster.get_speed() * -1)
                 elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                     monster_and_key = ListItem(monster, monster.get_level() * -1)
-                self.team.add(monster_and_key)
+                self.team.add(monster_and_key) #Best case Worst case O(len(self))  
 
 
             elif self.reversed == True:
@@ -120,51 +127,56 @@ class MonsterTeam:
                     monster_and_key = ListItem(monster, monster.get_speed())
                 elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                     monster_and_key = ListItem(monster, monster.get_level())
-                self.team.add(monster_and_key)
+                self.team.add(monster_and_key) #Best case Worst case O(len(self))  
 
 
 
     def retrieve_from_team(self) -> MonsterBase:
-        if self.team_mode.name == "FRONT": 
+        """O(1) best case, O(len(self)) worst case"""
+        if self.team_mode.name == "FRONT": #O(1)  Best case worst case
             return self.team.pop()
-        elif self.team_mode.name == "BACK":     
+        elif self.team_mode.name == "BACK":     #O(1)  Best case worst case
             return self.team.serve()
-        elif self.team_mode.name == "OPTIMISE": 
-            return self.team.delete_at_index(0).value
+        elif self.team_mode.name == "OPTIMISE": #O(1)  Best case O(len(self)) worst case
+            return self.team.delete_at_index(0).value #O(1)  Best case O(len(self)) worst case
 
     def special(self) -> None:
+        """Best Case O(n or 1) Worst case O(n * Len(self))"""
         if self.team_mode.name == "FRONT": 
+            """O(1) or O(n)"""
             buffer_queue = CircularQueue(3)
-            for _ in range(min(MonsterTeam.TEAM_LIMIT//2, len(self.team))):
-                buffer_queue.append(self.team.pop())
-            for _ in range(len(buffer_queue)):
-                self.team.push(buffer_queue.serve())
+            for _ in range(min(MonsterTeam.TEAM_LIMIT//2, len(self.team))): #O(1) best and worst case THIS COULD BE o(N) TOO
+                buffer_queue.append(self.team.pop()) #O(1)
+            for _ in range(len(buffer_queue)): #O(1) UNLESS BUFFER IS INF
+                self.team.push(buffer_queue.serve())    # O(N)
         elif self.team_mode.name == "BACK":
+            """O(N)"""
             front_half = len(self.team)//2
             back_half = len(self.team)-(len(self.team)//2)     
             buffer_queue = CircularQueue(front_half)
             buffer_stack = ArrayStack(back_half)
-            for _ in range(front_half):
-                buffer_queue.append(self.team.serve())
-            for _ in range(back_half):     
-                buffer_stack.push(self.team.serve())
+            for _ in range(front_half): #O(n)
+                buffer_queue.append(self.team.serve())#O(1)
+            for _ in range(back_half):     #O(N)
+                buffer_stack.push(self.team.serve())#O(1)
             
-            for _ in range(back_half):
-                self.team.append(buffer_stack.pop())
-            for _ in range(front_half):
-                self.team.append(buffer_queue.serve())
+            for _ in range(back_half): #O(N)
+                self.team.append(buffer_stack.pop())#O(1)
+            for _ in range(front_half):#O(N)
+                self.team.append(buffer_queue.serve())#O(1)
             
         elif self.team_mode.name == "OPTIMISE": 
+            """O(n * Len(self))"""
             buffer_list = ArraySortedList(self.TEAM_LIMIT)
             team_length = len(self.team)
-            for _ in range(team_length):
-                monster_and_key = self.team.delete_at_index(0)
+            for _ in range(team_length):    #O(N)
+                monster_and_key = self.team.delete_at_index(0)   #O(1)  Best case O(len(self)) worst case
                 monster = monster_and_key.value
                 key_reversed = monster_and_key.key * -1
                 monster_and_reversed_key = ListItem(monster, key_reversed)
-                buffer_list.add(monster_and_reversed_key)
-            for _ in range(team_length):
-                self.team.add(buffer_list.delete_at_index(0))
+                buffer_list.add(monster_and_reversed_key)#Best case Worst case O(len(self)) 
+            for _ in range(team_length):#O(N)
+                self.team.add(buffer_list.delete_at_index(0))#Best case Worst case O(len(self)) 
             if self.reversed == False:
                 self.reversed = True
             elif self.reversed == True:
