@@ -17,6 +17,8 @@ class BattleTower:
     MAX_LIVES = 10
 
     def __init__(self, battle: Battle|None=None) -> None:
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         self.battle = battle or Battle(verbosity=0)
         self.elements_so_far = BSet()
 
@@ -24,17 +26,25 @@ class BattleTower:
 
 
     def set_my_team(self, team: MonsterTeam) -> None:
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         # Generate the team lives here too.
         self.player_team = team
         self.lives = RandomGen.randint(self.MIN_LIVES, self.MAX_LIVES)
 
 
     def generate_teams(self, n: int) -> None:
+        """ everything unless stated otherwise is o(1)
+        n = len(input)
+        best case o(n)
+        worst case o(n)"""
         self.enemy_teams = CircularQueue(n)
         for _ in range(n):
             self.enemy_teams.append(((MonsterTeam(team_mode=MonsterTeam.TeamMode.BACK,selection_mode=MonsterTeam.SelectionMode.RANDOM)), RandomGen.randint(self.MIN_LIVES, self.MAX_LIVES)))
 
     def battles_remaining(self) -> bool:
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         if self.enemy_teams.is_empty():
             return False
         else:
@@ -44,19 +54,24 @@ class BattleTower:
         
 
     def next_battle(self) -> tuple[Battle.Result, MonsterTeam, MonsterTeam, int, int]:
+        """ everything unless stated otherwise is o(1)
+        n = len(self)
+        m = monster hp input
+        best case o(n)
+        worst case o(n^2)"""
         b = Battle(1)
 
         enemy_team_and_lives = self.enemy_teams.serve()
         self.enemy_team_out = enemy_team_and_lives[0]
         enemy_team_out_lives = enemy_team_and_lives[1]
         print(len(self.player_team))
-        self.enemy_team_out.regenerate_team()
-        self.player_team.regenerate_team()
+        self.enemy_team_out.regenerate_team() #best case o(n) worst case o(n^2)
+        self.player_team.regenerate_team()  #best case o(n) worst case o(n^2)
         print("Team 1 has", len(self.player_team),"monsters and", self.lives, "lives!")
         print("Team 2 has", len(self.enemy_team_out),"monsters and", enemy_team_out_lives, "lives!")
-        result = b.battle(self.player_team, self.enemy_team_out)
-        self.enemy_team_out.regenerate_team()
-        self.player_team.regenerate_team()
+        result = b.battle(self.player_team, self.enemy_team_out) # best case o(1) worst case (n*m)
+        self.enemy_team_out.regenerate_team()   #best case o(n) worst case o(n^2)
+        self.player_team.regenerate_team()      #best case o(n) worst case o(n^2)
         if result == Battle.Result.TEAM1:
             enemy_team_out_lives -= 1
         elif result == Battle.Result.TEAM2:
@@ -75,6 +90,11 @@ class BattleTower:
         return [result, self.player_team, self.enemy_team_out, self.lives, enemy_team_out_lives]
 
     def out_of_meta(self) -> ArrayR[Element]:
+        """ everything unless stated otherwise is o(1)
+        n = len(self)
+
+        best case o(n)
+        worst case o(n^2)"""
         
         next_team = self.enemy_teams.peek()[0]
         preteam = BSet()
@@ -88,11 +108,11 @@ class BattleTower:
         except:
             return no_meta
         
-        while len(self.enemy_team_out):
+        while len(self.enemy_team_out): #o(n)
             preteam.add(Element.from_string(self.enemy_team_out.retrieve_from_team().get_element()).value) #grab all elements from preteam
-        while len(self.player_team):   
+        while len(self.player_team):  #o(n) 
             player_team.add(Element.from_string(self.player_team.retrieve_from_team().get_element()).value) #grabs all elements from player team
-        while len(next_team):
+        while len(next_team):#o(n)
             next_team_elements.add(Element.from_string(next_team.retrieve_from_team().get_element()).value)
         
 
@@ -102,12 +122,12 @@ class BattleTower:
         out_of_meta_Bset = self.elements_so_far.difference(player_team)
         out_of_meta_Bset = out_of_meta_Bset.difference(next_team_elements)
 
-        self.enemy_team_out.regenerate_team()
-        self.player_team.regenerate_team()
+        self.enemy_team_out.regenerate_team()#best case o(n) worst case o(n^2)
+        self.player_team.regenerate_team()#best case o(n) worst case o(n^2)
 
         out_of_meta = ArrayR(len(out_of_meta_Bset))
         i = 0
-        for element in Element:
+        for element in Element: #o(e) e is elements in Element
             if out_of_meta_Bset.__contains__(element.value):
                 out_of_meta.__setitem__(i,element)
                 i +=1
@@ -173,4 +193,7 @@ if __name__ == "__main__":
     result, t1, t2, l1, l2 = bt.next_battle()
     # After the fourth game, We are back to missing Grass, Dragon, Fighting and Flying
     print(bt.out_of_meta().to_list(), [Element.GRASS, Element.DRAGON, Element.FIGHTING, Element.FLYING])
+
+
+    
 

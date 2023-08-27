@@ -59,6 +59,8 @@ class EffectivenessCalculator:
     instance: Optional[EffectivenessCalculator] = None
 
     def __init__(self, element_names: ArrayR[str], effectiveness_values: ArrayR[float]) -> None:
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         """
         Initialise the Effectiveness Calculator.
 
@@ -79,11 +81,15 @@ class EffectivenessCalculator:
         self.effectiveness_values = effectiveness_values
 
     @classmethod
-    def get_effectiveness(cls, type1: Element, type2: Element) -> float:    #o(n*comp + n*comp) = o(n*comp)
+    def get_effectiveness(cls, type1: Element, type2: Element) -> float:    
         """
         Returns the effectivness of elem1 attacking elem2.
 
         Example: EffectivenessCalculator.get_effectiveness(Element.FIRE, Element.WATER) == 0.5
+
+        everything unless stated otherwise is o(1)
+        n is element inputs
+        o(n*comp + n*comp) = o(n*comp) n = input number of elements in element names
         """
         index = 0
         for i in range(len(cls.instance.element_names)):                                   #o(n)

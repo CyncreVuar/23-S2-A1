@@ -25,8 +25,11 @@ class Stats(abc.ABC):
 
 #Anything otherwise is O(1)
 class SimpleStats(Stats):
+    """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
 
     def __init__(self, attack, defense, speed, max_hp) -> None:
+        
         # TODO: Implement
         self.attack = attack
         self.defense = defense
@@ -62,6 +65,8 @@ class ComplexStats(Stats):
         pass
 
     def get_attack(self, level: int):
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         calc_stack = ArrayStack(20)
         for elem in self.attack_formula:
             if elem == "+":
@@ -98,6 +103,8 @@ class ComplexStats(Stats):
         return int(calc_stack.pop())
 
     def get_defense(self, level: int):
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         calc_stack = ArrayStack(20)
         for elem in self.defense_formula:
             if elem == "+":
@@ -134,6 +141,8 @@ class ComplexStats(Stats):
         return int(calc_stack.pop())
 
     def get_speed(self, level: int):
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         calc_stack = ArrayStack(20)
         for elem in self.speed_formula:
             if elem == "+":
@@ -170,6 +179,8 @@ class ComplexStats(Stats):
         return int(calc_stack.pop())
 
     def get_max_hp(self, level: int):
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         calc_stack = ArrayStack(20)
         for elem in self.max_hp_formula:
             if elem == "+":

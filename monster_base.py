@@ -70,6 +70,8 @@ class MonsterBase(abc.ABC):
 
     def attack(self, other: MonsterBase):
         """Attack another monster instance"""
+        """ everything unless stated otherwise is o(1)
+        best and worst case o(1)"""
         # Step 1: Compute attack stat vs. defense stat
         # Step 2: Apply type effectiveness
         # Step 3: Ceil to int

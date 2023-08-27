@@ -43,7 +43,8 @@ class MonsterTeam:
     TEAM_LIMIT = 6
 
     def __init__(self, team_mode: TeamMode, selection_mode, **kwargs) -> None:
-        """O(1) best case and worse case"""
+        """everything unless stated otherwise is o(1)
+        O(1) best case and worse case"""
         # Add any preinit logic here.
         self.team_mode = team_mode
 
@@ -87,22 +88,35 @@ class MonsterTeam:
         
         
     def __str__ (self):
-        """o(1) best case and worse case"""
+        """everything unless stated otherwise is o(1)
+        o(1) best case and worse case"""
         return (f"{self.team_mode.name} TEAM")
     def __len__ (self):
 
         return len(self.team)
 
     def add_to_team(self, monster: MonsterBase):
-        """O(1) Best and worst case"""
-        if self.team_mode.name == "FRONT": # O(1) Best case worst case
+        """everything unless stated otherwise is o(1)
+        O(1) Best case
+         O(n) worst case"""
+        if self.team_mode.name == "FRONT": 
+            """everything unless stated otherwise is o(1)
+            O(1) Best case worst case"""
             self.team.push(monster)
-        elif self.team_mode.name == "BACK":  # O(1) Best case worst case
+
+
+        elif self.team_mode.name == "BACK": 
+            """everything unless stated otherwise is o(1)
+            O(1) Best case worst case""" 
             self.team.append(monster)
-        elif self.team_mode.name == "OPTIMISE": #Best case Worst case O(len(self))  
 
 
-            if self.reversed == False: #O(1) best and worst case
+        elif self.team_mode.name == "OPTIMISE": 
+            """everything unless stated otherwise is o(1)
+            Best case O(log(n)) Worst case O(n)""" 
+
+
+            if self.reversed == False: 
                 if self.sort_method == MonsterTeam.SortMode.HP:
                     monster_and_key = ListItem(monster, monster.get_hp() * -1)
                 elif self.sort_method == MonsterTeam.SortMode.ATTACK:
@@ -113,7 +127,7 @@ class MonsterTeam:
                     monster_and_key = ListItem(monster, monster.get_speed() * -1)
                 elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                     monster_and_key = ListItem(monster, monster.get_level() * -1)
-                self.team.add(monster_and_key) #Best case Worst case O(len(self))  
+                self.team.add(monster_and_key) #Best case O(log(n)) Worst case O(n)
 
 
             elif self.reversed == True:
@@ -127,30 +141,46 @@ class MonsterTeam:
                     monster_and_key = ListItem(monster, monster.get_speed())
                 elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                     monster_and_key = ListItem(monster, monster.get_level())
-                self.team.add(monster_and_key) #Best case Worst case O(len(self))  
+                self.team.add(monster_and_key) #Best case O(log(n)) Worst case O(n)  
 
 
 
     def retrieve_from_team(self) -> MonsterBase:
-        """O(1) best case, O(len(self)) worst case"""
-        if self.team_mode.name == "FRONT": #O(1)  Best case worst case
+        """everything unless stated otherwise is o(1)
+        O(1) best case, O(N) worst case N is len(self)"""
+        if self.team_mode.name == "FRONT": 
+            """O(1)  Best case worst case"""
             return self.team.pop()
-        elif self.team_mode.name == "BACK":     #O(1)  Best case worst case
+        
+
+        elif self.team_mode.name == "BACK":
+            """everything unless stated otherwise is o(1)
+            O(1)  Best case worst case"""
             return self.team.serve()
-        elif self.team_mode.name == "OPTIMISE": #O(1)  Best case O(len(self)) worst case
-            return self.team.delete_at_index(0).value #O(1)  Best case O(len(self)) worst case
+        
+        
+        elif self.team_mode.name == "OPTIMISE":
+            """everything unless stated otherwise is o(1)
+            O(N) best case, O(N) worst case N is len(self)
+            This always deletes the head"""
+            return self.team.delete_at_index(0).value #Best case O(len(self)) worst case O(len(self))
 
     def special(self) -> None:
-        """Best Case O(n or 1) Worst case O(n * Len(self))"""
+        """everything unless stated otherwise is o(1)
+        Best Case O(n) Worst case O(n * Len(self)) """
+
         if self.team_mode.name == "FRONT": 
-            """O(1) or O(n)"""
+            """everything unless stated otherwise is o(1)
+            O(N) Best and worst case"""
             buffer_queue = CircularQueue(3)
-            for _ in range(min(MonsterTeam.TEAM_LIMIT//2, len(self.team))): #O(1) best and worst case THIS COULD BE o(N) TOO
+            for _ in range(min(3, len(self.team))): #O(1) best and worst case
                 buffer_queue.append(self.team.pop()) #O(1)
-            for _ in range(len(buffer_queue)): #O(1) UNLESS BUFFER IS INF
+            for _ in range(len(buffer_queue)): #O(n) 
                 self.team.push(buffer_queue.serve())    # O(N)
+
         elif self.team_mode.name == "BACK":
-            """O(N)"""
+            """everything unless stated otherwise is o(1)
+            best and worst case O(N), N being len(self)"""
             front_half = len(self.team)//2
             back_half = len(self.team)-(len(self.team)//2)     
             buffer_queue = CircularQueue(front_half)
@@ -166,64 +196,86 @@ class MonsterTeam:
                 self.team.append(buffer_queue.serve())#O(1)
             
         elif self.team_mode.name == "OPTIMISE": 
-            """O(n * Len(self))"""
+            """everything unless stated otherwise is o(1)
+            Best case O(n^2)  Worst case O(n * n) = O(n^2) n being len(self)"""
             buffer_list = ArraySortedList(self.TEAM_LIMIT)
             team_length = len(self.team)
             for _ in range(team_length):    #O(N)
-                monster_and_key = self.team.delete_at_index(0)   #O(1)  Best case O(len(self)) worst case
+                monster_and_key = self.team.delete_at_index(0)   #Best case O(len(self)) worst case O(len(self))
                 monster = monster_and_key.value
                 key_reversed = monster_and_key.key * -1
                 monster_and_reversed_key = ListItem(monster, key_reversed)
-                buffer_list.add(monster_and_reversed_key)#Best case Worst case O(len(self)) 
+                buffer_list.add(monster_and_reversed_key)#Best case O(log(n)) Worst case O(n)  
             for _ in range(team_length):#O(N)
-                self.team.add(buffer_list.delete_at_index(0))#Best case Worst case O(len(self)) 
+                self.team.add(buffer_list.delete_at_index(0))#Best case Worst case O(n)  
             if self.reversed == False:
                 self.reversed = True
             elif self.reversed == True:
                 self.reversed == False
 
     def regenerate_team(self) -> None:
-        while len(self.team):               #empty out team
-            self.retrieve_from_team()
+        """ everything unless stated otherwise is o(1)
+        N = len(self)
+        best case
+        O(N*1)
+        
+        Worst case
+        O(N*N)
+        
+        
+        """
+        while len(self.team):               #empty out team. While loop runs len(self times)
+            self.retrieve_from_team()       # o(1) best case o(n) Worst case
 
 
         if self.team_mode.name == "FRONT":
+            """ everything unless stated otherwise is o(1)
+            N = len(self)
+            o(n+n) = o(n)"""
             buffer_stack_copy = ArrayStack(6)
             buffer_stack = ArrayStack(6)
-            while len(self.team_original): 
-                monster = self.team_original.pop()
+            while len(self.team_original): #o(n)
+                monster = self.team_original.pop() 
                 monster_copy = type(monster)(simple_mode=monster.simple_mode, level=monster.level)
                 buffer_stack_copy.push(monster_copy)
                 buffer_stack.push(monster)
 
-            while len(buffer_stack): 
+            while len(buffer_stack):  #o(n)
                 monster_copy = buffer_stack_copy.pop()
                 monster = buffer_stack.pop()
-                self.add_to_team(monster_copy)
+                self.add_to_team(monster_copy) #o(1)
                 self.team_original.push(monster)
             
         elif self.team_mode.name == "BACK":
+            """ everything unless stated otherwise is o(1)
+            N = len(self)
+            o(n+n) = o(n)"""
             buffer_queue = CircularQueue(6)
-            while len(self.team_original):     
+            while len(self.team_original):  #runs len(self) times   
                 monster = self.team_original.serve()
                 monster_copy = type(monster)(simple_mode=monster.simple_mode, level=monster.level)
                 self.add_to_team(monster_copy)
                 buffer_queue.append(monster)
-            while len(buffer_queue):
+            while len(buffer_queue): #o(n)
                 self.team_original.append(buffer_queue.serve())
             
 
 
         elif self.team_mode.name == "OPTIMISE":
+            """everything unless stated otherwise is o(1)
+            N = len(self)
+            Best case o(n^2))
+            Worst case o(n^2)"""
+            self.reversed = False
             buffer_slist = ArraySortedList(6)
-            while len(self.team_original): 
-                monster_and_key = self.team_original.delete_at_index(0)
+            while len(self.team_original): #o(n)
+                monster_and_key = self.team_original.delete_at_index(0)     #O(len(self)) worst case
                 monster = monster_and_key.value
                 monster_copy = type(monster)(simple_mode=monster.simple_mode, level=monster.level)
                 self.add_to_team(monster_copy)
-                buffer_slist.add(monster_and_key)
-            while len(buffer_slist):
-                self.team_original.add(buffer_slist.delete_at_index(0))
+                buffer_slist.add(monster_and_key) #Best case O(log(n)) Worst case O(n)
+            while len(buffer_slist): #o(n)
+                self.team_original.add(buffer_slist.delete_at_index(0))     #O(len(self)) worst case
 
 
                 
@@ -235,6 +287,10 @@ class MonsterTeam:
         
 
     def select_randomly(self):
+        """everything unless stated otherwise is o(1)
+        N = len(self)
+        Best case = O(n*log(n))
+        Worst case O(n^2)"""
         team_size = RandomGen.randint(1, self.TEAM_LIMIT)
         monsters = get_all_monsters()
         n_spawnable = 0
@@ -251,11 +307,20 @@ class MonsterTeam:
                     if cur_index == spawner_index:
                         # Spawn this monster
                         self.add_to_team(monsters[x]())
+
                         if self.team_mode.name == "FRONT": 
+                            """everything unless stated otherwise is o(1)
+                            O(1) best and worst case"""
                             self.team_original.push(monsters[x]())
-                        elif self.team_mode.name == "BACK":     
+
+                        elif self.team_mode.name == "BACK":   
+                            """everything unless stated otherwise is o(1)
+                            O(1) best and worst case"""  
                             self.team_original.append(monsters[x]())
+
                         elif self.team_mode.name == "OPTIMISE": 
+                            """everything unless stated otherwise is o(1)
+                            Best case O(log(n)) Worst case O(n) """
                             if self.sort_method == MonsterTeam.SortMode.HP:
                                 monster_and_key = ListItem(monsters[x](), monsters[x]().get_hp() * -1)
                             elif self.sort_method == MonsterTeam.SortMode.ATTACK:
@@ -266,25 +331,29 @@ class MonsterTeam:
                                 monster_and_key = ListItem(monsters[x](), monsters[x]().get_speed() * -1)
                             elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                                 monster_and_key = ListItem(monsters[x](), monsters[x]().get_level() * -1)
-                            self.team_original.add(monster_and_key)   
+                            self.team_original.add(monster_and_key)   #Best case O(log(n)) Worst case O(n) 
                         break
             else:
                 raise ValueError("Spawning logic failed.")
 
     def select_manually(self):
+        """everything unless stated otherwise is o(1)
+        n = len(self)
+        Best case o(n)
+        Worst case o(n^2)"""
         check = False
-        while check == False:
+        while check == False: # check and input assumed o(1)
             Team_size = input("How many monsters are there?")
             try: 
                 Team_size = int(Team_size)
-                if Team_size <= 6 and Team_size > 0:
+                if Team_size <= self.TEAM_LIMIT and Team_size > 0:
                     check = True
             except:
                 print("Please enter an integer between 1 and 6")
 
 
         check = False
-        for _ in range(Team_size):
+        for _ in range(Team_size): #O(n)
             check = False
             print("""MONSTERS Are:
             1: Flamikin [✔️]
@@ -328,7 +397,7 @@ class MonsterTeam:
             39: Faeboa [✔️]
             40: Bugrattler [✔️]
             41: Darkadder [✔️]""")
-            while check == False:
+            while check == False: #o(1)
                 monster_pick = input("Which monster are you spawning?")
                 monsters = get_all_monsters()
                 try: 
@@ -341,12 +410,12 @@ class MonsterTeam:
                 except:
                     print("This monster cannot be spawned.")
             
-            self.add_to_team(monsters[monster_pick - 1]())
+            self.add_to_team(monsters[monster_pick - 1]())#O(1) Best case O(n) worst case
 
             if self.team_mode.name == "FRONT": 
-                self.team_original.push(monsters[monster_pick - 1]())
+                self.team_original.push(monsters[monster_pick - 1]()) #o(1)
             elif self.team_mode.name == "BACK":     
-                self.team_original.append(monsters[monster_pick - 1]())
+                self.team_original.append(monsters[monster_pick - 1]()) #o(1)
             elif self.team_mode.name == "OPTIMISE": 
                 if self.sort_method == MonsterTeam.SortMode.HP:
                     monster_and_key = ListItem(monsters[monster_pick - 1](), monsters[monster_pick - 1]().get_hp() * -1)
@@ -358,7 +427,7 @@ class MonsterTeam:
                     monster_and_key = ListItem(monsters[monster_pick - 1](), monsters[monster_pick - 1]().get_speed() * -1)
                 elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                     monster_and_key = ListItem(monsters[monster_pick - 1](), monsters[monster_pick - 1]().get_level() * -1)
-                self.team_original.add(monster_and_key)    
+                self.team_original.add(monster_and_key) #Best case O(log(n)) Worst case O(n)     
 
 
         """
@@ -372,99 +441,8 @@ class MonsterTeam:
                     This integer corresponds to an index (1-indexed) of the helpers method
                     get_all_monsters()
                 * If invalid of monster is not spawnable, should ask again.
+                """
 
-        Add these monsters to the team in the same order input was provided. Example interaction:
-
-        How many monsters are there? 2
-        MONSTERS Are:
-        1: Flamikin [✔️]
-        2: Infernoth [❌]
-        3: Infernox [❌]
-        4: Aquariuma [✔️]
-        5: Marititan [❌]
-        6: Leviatitan [❌]
-        7: Vineon [✔️]
-        8: Treetower [❌]
-        9: Treemendous [❌]
-        10: Rockodile [✔️]
-        11: Stonemountain [❌]
-        12: Gustwing [✔️]
-        13: Stormeagle [❌]
-        14: Frostbite [✔️]
-        15: Blizzarus [❌]
-        16: Thundrake [✔️]
-        17: Thunderdrake [❌]
-        18: Shadowcat [✔️]
-        19: Nightpanther [❌]
-        20: Mystifly [✔️]
-        21: Telekite [❌]
-        22: Metalhorn [✔️]
-        23: Ironclad [❌]
-        24: Normake [❌]
-        25: Strikeon [✔️]
-        26: Venomcoil [✔️]
-        27: Pythondra [✔️]
-        28: Constriclaw [✔️]
-        29: Shockserpent [✔️]
-        30: Driftsnake [✔️]
-        31: Aquanake [✔️]
-        32: Flameserpent [✔️]
-        33: Leafadder [✔️]
-        34: Iceviper [✔️]
-        35: Rockpython [✔️]
-        36: Soundcobra [✔️]
-        37: Psychosnake [✔️]
-        38: Groundviper [✔️]
-        39: Faeboa [✔️]
-        40: Bugrattler [✔️]
-        41: Darkadder [✔️]
-        Which monster are you spawning? 38
-        MONSTERS Are:
-        1: Flamikin [✔️]
-        2: Infernoth [❌]
-        3: Infernox [❌]
-        4: Aquariuma [✔️]
-        5: Marititan [❌]
-        6: Leviatitan [❌]
-        7: Vineon [✔️]
-        8: Treetower [❌]
-        9: Treemendous [❌]
-        10: Rockodile [✔️]
-        11: Stonemountain [❌]
-        12: Gustwing [✔️]
-        13: Stormeagle [❌]
-        14: Frostbite [✔️]
-        15: Blizzarus [❌]
-        16: Thundrake [✔️]
-        17: Thunderdrake [❌]
-        18: Shadowcat [✔️]
-        19: Nightpanther [❌]
-        20: Mystifly [✔️]
-        21: Telekite [❌]
-        22: Metalhorn [✔️]
-        23: Ironclad [❌]
-        24: Normake [❌]
-        25: Strikeon [✔️]
-        26: Venomcoil [✔️]
-        27: Pythondra [✔️]
-        28: Constriclaw [✔️]
-        29: Shockserpent [✔️]
-        30: Driftsnake [✔️]
-        31: Aquanake [✔️]
-        32: Flameserpent [✔️]
-        33: Leafadder [✔️]
-        34: Iceviper [✔️]
-        35: Rockpython [✔️]
-        36: Soundcobra [✔️]
-        37: Psychosnake [✔️]
-        38: Groundviper [✔️]
-        39: Faeboa [✔️]
-        40: Bugrattler [✔️]
-        41: Darkadder [✔️]
-        Which monster are you spawning? 2
-        This monster cannot be spawned.
-        Which monster are you spawning? 1
-        """
  
 
     def select_provided(self, provided_monsters:Optional[ArrayR[type[MonsterBase]]]=None):
@@ -480,15 +458,19 @@ class MonsterTeam:
         Example team if in TeamMode.FRONT:
         [Gustwing Instance, Aquariuma Instance, Flamikin Instance]
         """
+        """everything unless stated otherwise is o(1)
+        n = len(self)
+        Best case o(n)'
+        Worst case o(n^2)"""
         if len(provided_monsters) > 6:
             raise ValueError()
-        for i in range(len(provided_monsters)):
+        for i in range(len(provided_monsters)): #o(n)
             monster = provided_monsters.__getitem__(i)()
             if provided_monsters.__getitem__(i).can_be_spawned() == False:
                 raise ValueError(provided_monsters.__getitem__(i), "cannot be spawned")
 
             monster_copy = provided_monsters.__getitem__(i)()
-            self.add_to_team(monster)
+            self.add_to_team(monster)#O(1) Best case O(n) worst case
             if self.team_mode.name == "FRONT": 
                 self.team_original.push(monster_copy)
             elif self.team_mode.name == "BACK":     
@@ -504,7 +486,7 @@ class MonsterTeam:
                     monster_and_key = ListItem(monster_copy, monster_copy.get_speed() * -1)
                 elif self.sort_method == MonsterTeam.SortMode.LEVEL:
                     monster_and_key = ListItem(monster_copy, monster_copy.get_level() * -1)
-                self.team_original.add(monster_and_key) 
+                self.team_original.add(monster_and_key) #Best case O(log(n)) Worst case O(n) 
 
 
     def choose_action(self, currently_out: MonsterBase, enemy: MonsterBase) -> Battle.Action:
@@ -515,86 +497,98 @@ class MonsterTeam:
         return Battle.Action.SWAP
 
 if __name__ == "__main__":
+
     # team = MonsterTeam(
     #     team_mode=MonsterTeam.TeamMode.OPTIMISE,
-    #     selection_mode=MonsterTeam.SelectionMode.RANDOM,
+    #     selection_mode=MonsterTeam.SelectionMode.PROVIDED,
     #     sort_key=MonsterTeam.SortMode.HP,
+    #     provided_monsters=ArrayR.from_list([Flamikin, Aquariuma, Vineon, Thundrake, Thundrake, Thundrake])
     # )
+
+    # print('*******')
     # print(team)
+
+    # hi = team.retrieve_from_team()
+    # hi.set_hp(2)
+    # team.add_to_team(hi)
+
+    # while len(team):
+    #     print(team.retrieve_from_team())
+    
+    # team.regenerate_team()
+    # print('\n')
+
+    # team.special()
+
+    # hi = team.retrieve_from_team()
+    # hi.set_hp(2)
+    # team.add_to_team(hi)
+
+    # team.regenerate_team()
+    
     # while len(team):
     #     print(team.retrieve_from_team())
 
 
-    # my_monsters = ArrayR(4)
-    # my_monsters[0] = Flamikin
-    # my_monsters[1] = Aquariuma
-    # my_monsters[2] = Vineon
-    # my_monsters[3] = Thundrake
-    # extra = Normake()
-    # team = MonsterTeam(
-    #     team_mode=MonsterTeam.TeamMode.BACK,
-    #     selection_mode=MonsterTeam.SelectionMode.MANUAL,
-    #     # provided_monsters=my_monsters
-    # )
-    # print(team.retrieve_from_team())
-    # print(team.retrieve_from_team())
-    # print(team.retrieve_from_team())
-    # team.regenerate_team()
-    # print(len(team))
-    # print(team.retrieve_from_team())
+
+
+    
+
+
+    class WeakThundrake(Thundrake):
+        def get_max_hp(self):
+            return 5
+    my_monsters = ArrayR(4)
+    my_monsters[0] = Flamikin   # 6 HP
+    my_monsters[1] = Aquariuma  # 8 HP
+    my_monsters[2] = Rockodile  # 9 HP
+    my_monsters[3] = WeakThundrake  # 5 HP
     team = MonsterTeam(
         team_mode=MonsterTeam.TeamMode.OPTIMISE,
         selection_mode=MonsterTeam.SelectionMode.PROVIDED,
         sort_key=MonsterTeam.SortMode.HP,
-        provided_monsters=ArrayR.from_list([Flamikin, Aquariuma, Vineon, Thundrake, Thundrake, Thundrake])
+        provided_monsters=my_monsters,
     )
+    # Rockodile, Aquariuma, Flamikin, Thundrake
+    rockodile = team.retrieve_from_team()
+    aquariuma = team.retrieve_from_team()
+    flamikin = team.retrieve_from_team()
+    print(rockodile, Rockodile)
+    print(aquariuma, Aquariuma)
+    print(flamikin, Flamikin)
 
-    print('*******')
-    print(team)
-
-    hi = team.retrieve_from_team()
-    hi.set_hp(2)
-    team.add_to_team(hi)
-
-    while len(team):
-        print(team.retrieve_from_team())
-    
-    team.regenerate_team()
-    print('\n')
+    rockodile.set_hp(2)
+    flamikin.set_hp(4)
+    team.add_to_team(rockodile)
+    team.add_to_team(aquariuma)
+    team.add_to_team(flamikin)
+    # Aquariuma, Thundrake, Flamikin, Rockodile
 
     team.special()
+    # Rockodile, Flamikin, Thundrake, Aquariuma
+    rockodile = team.retrieve_from_team()
+    flamikin = team.retrieve_from_team()
+    print(rockodile, Rockodile)
+    print(flamikin, Flamikin)
 
-    hi = team.retrieve_from_team()
-    hi.set_hp(2)
-    team.add_to_team(hi)
+
+    flamikin.set_hp(1)
+    team.add_to_team(flamikin)
+    team.add_to_team(rockodile)
+
+    flamikin = team.retrieve_from_team()
+    print(flamikin, Flamikin)
 
     team.regenerate_team()
-    
+    # Back to normal sort order and Rockodile, Aquariuma, Flamikin, Thundrake
     while len(team):
         print(team.retrieve_from_team())
 
-
-
-
-    
-
-
-
-
-
-
-    # flamikin.set_hp(1)
-    # team.add_to_team(flamikin)
-    # team.add_to_team(rockodile)
-
-    # flamikin = team.retrieve_from_team()
-    # self.assertIsInstance(flamikin, Flamikin)
-
-    # team.regenerate_team()
 
     # rockodile = team.retrieve_from_team()
     # aquariuma = team.retrieve_from_team()
-    # self.assertIsInstance(rockodile, Rockodile)
-    # self.assertIsInstance(aquariuma, Aquariuma)
-    # self.assertEqual(rockodile.get_hp(), 9)
-    # self.assertEqual(aquariuma.get_hp(), 8)
+    # print(rockodile, Rockodile)
+    # print(aquariuma, Aquariuma)
+    # print(rockodile.get_hp(), 9)
+    # print(aquariuma.get_hp(), 8)
+    
